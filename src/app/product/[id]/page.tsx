@@ -61,29 +61,31 @@ const Detailpageshop = ({ params }: Params) => {
     const [selectedSize, setSelectedSize] = useState<SizeOption | null>(null);
     const [selectedColor, setSelectedColor] = useState<ColorOption | null>(null);
 
-    useEffect(() => { if (typeof window !== 'undefined') { 
-        const savedWishlist = localStorage.getItem('wishlist'); 
-        if (savedWishlist) { 
-            setWishlist(JSON.parse(savedWishlist) as Data[]); 
-        } } 
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const savedWishlist = localStorage.getItem('wishlist');
+            if (savedWishlist) {
+                setWishlist(JSON.parse(savedWishlist) as Data[]);
+            }
+        }
     }, []);
 
-    const addToWishlist = (product: Data) => { 
+    const addToWishlist = (product: Data) => {
         console.log('Product:', product); // Log product data
         console.log('Current Wishlist:', wishlist); // Log current wishlist
-    
+
         if (!wishlist.some(item => item.id === product.id)) { // Avoid duplicate entries
-            const updatedWishlist: Data[] = [...wishlist, product]; 
+            const updatedWishlist: Data[] = [...wishlist, product];
             console.log('Updated Wishlist:', updatedWishlist); // Log updated wishlist
-            setWishlist(updatedWishlist); 
+            setWishlist(updatedWishlist);
             if (typeof window !== 'undefined') { // Check if window is defined
-                localStorage.setItem('wishlist', JSON.stringify(updatedWishlist)); 
+                localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
             }
             console.log('Wishlist stored:', updatedWishlist); // Log the wishlist data
         }
     };
-    
-    
+
+
     useEffect(() => {
         const savedWishlist = localStorage.getItem('wishlist');
         if (savedWishlist) {
@@ -96,9 +98,9 @@ const Detailpageshop = ({ params }: Params) => {
             }
         }
     }, []);
-    
-    
-    
+
+
+
 
     const sizeOptions: SizeOption[] = [
         { value: 'L', label: 'L' },
@@ -108,7 +110,7 @@ const Detailpageshop = ({ params }: Params) => {
 
     // Color options array
     const colorOptions: ColorOption[] = [
-        { value: '#816DFA', label: '#816DFA'},
+        { value: '#816DFA', label: '#816DFA' },
         { value: '#000000', label: '#000000' },
         { value: '#CDBA7B', label: '#CDBA7B' },
     ];
@@ -183,8 +185,33 @@ const Detailpageshop = ({ params }: Params) => {
             removeFromCart(product.id);
         }
     };
+    const calculateSubtotal = (price: number, quantity: number) => {
+      console.log("Price:", price, "Quantity:", quantity); // Debugging line
+      return price * quantity;
+    };
 
+    const total = cart.reduce((acc, item) => {
+        const subtotal = calculateSubtotal(item.price, item.quantity);
+        return acc + subtotal;
+    }, 0);
 
+    const handleCheckOut = async (product: any) => {
+
+        try {
+            const response = await fetch('/api/payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ product })
+            })
+            const data = await response.json()
+            window.location.href = data.url;
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
 
     if (loading) {
         return <div className='loading'>
@@ -285,7 +312,7 @@ const Detailpageshop = ({ params }: Params) => {
                                     <div onClick={handleCart}> Add To Cart</div>
                                 </button>
                                 <button className='px-[15px]' onClick={() => addToWishlist(product)}>
-                                    <div><HiHeart size={24}/></div>
+                                    <div><HiHeart size={24} /></div>
                                 </button>
 
                                 {cartOpen && (
@@ -329,18 +356,24 @@ const Detailpageshop = ({ params }: Params) => {
 
 
 
-                                        <div className="subtotal flex justify-between items-center border-t-[1.50px] border-t-gray-300 pt-4">
-                                            <p>Subtotal</p>
-                                            <p className="text-[#B88E2F] font-medium">{product.price}</p>
+                                        <div className="subtotal !block justify-between items-center border-t-[1.50px] border-t-gray-300 pt-4">
+                                        <div className="flex gap-3">
+                                        <p>Subtotal:</p>
+                                        <p className="text-[#B88E2F] font-medium">{total}</p>
+                                        </div>
+                                        <div className="flex gap-3">
+                                        <p>Total:</p>
+                                        <p className="text-[#B88E2F] font-medium">{total}</p>
+                                        </div>
                                         </div>
 
                                         <div className="cart-buttons flex justify-between items-center mt-4 ">
-                                            <Link href="/cart">
+                                            {/* <Link href="/cart">
                                                 <button className="view-cart  rounded-full border-[1px] border-black">View Cart</button>
-                                            </Link>
-                                            <Link href="/checkout">
-                                                <button className="checkoutt  rounded-full border-[1px] border-black">Checkout</button>
-                                            </Link>
+                                            </Link> */}
+                                            <button>
+                                                <button onClick={() => handleCheckOut(product)} className="checkoutt  rounded-full border-[1px] border-black">Checkout</button>
+                                            </button>
                                         </div>
 
                                     </div>
