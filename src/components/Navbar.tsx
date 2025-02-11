@@ -1,8 +1,6 @@
 'use client';
 import { FaBars, FaTimes } from "react-icons/fa";
 import Image from 'next/image';
-import icon1 from '../../public/mdi_account-alert-outline.png';
-import icon2 from '../../public/akar-icons_search.png';
 import icon3 from '../../public/akar-icons_heart.png';
 import icon4 from '../../public/ant-design_shopping-cart-outlined.png';
 import Link from 'next/link';
@@ -58,9 +56,9 @@ function Navbar() {
         <div>
           <Link href="/wishlist/"><Image src={icon3} alt='icon3' /></Link>
         </div>
-        <div>
+        {/* <div>
           <Link href="/cart/"><Image src={icon4} alt='icon4' /></Link>
-        </div>
+        </div> */}
       </div>
     </div>
   )
